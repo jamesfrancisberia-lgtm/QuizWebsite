@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Knowledge & Tech Quiz</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .timer-progress {
+            transition: width 1s linear, background-color 0.5s ease;
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between p-4 sm:p-6 md:p-8">
+
+    <!-- Header Navigation -->
+    <header class="max-w-3xl w-full mx-auto flex justify-between items-center py-4 border-b border-slate-800">
+        <div class="flex items-center space-x-3">
+            <span class="text-3xl">🎓</span>
+            <div>
+                <h1 class="font-bold text-lg text-slate-100">James Quiz Dashboard</h1>
+                <p class="text-xs text-slate-400">General Knowledge & Coding Concepts</p>
+            </div>
+        </div>
+        <div id="status-badge" class="flex items-center space-x-2 bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700">
+            <span id="status-dot" class="w-2.5 h-2.5 rounded-full bg-slate-500"></span>
+            <span id="status-text" class="text-xs text-slate-300 font-medium">Ready</span>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-3xl w-full mx-auto my-auto py-6">
+
+        <!-- 1. START SCREEN -->
+        <div id="start-card" class="bg-slate-800/90 backdrop-blur-md rounded-2xl border border-slate-700 p-6 sm:p-10 shadow-2xl text-center fade-in">
+            <div class="w-16 h-16 bg-blue-600/20 text-blue-400 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-blue-500/30">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+            </div>
+
+            <h2 class="text-3xl font-extrabold text-white mb-3">Welcome to James Quiz!</h2>
+            <p class="text-slate-400 mb-8 max-w-lg mx-auto text-sm sm:text-base leading-relaxed">
+                
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 text-left">
+                <div class="bg-slate-900/70 p-4 rounded-xl border border-slate-700/60">
+                    <span class="text-xs text-slate-500 font-semibold uppercase tracking-wider block mb-1">PART 1 (Q1-10)</span>
+                    <span class="text-sm font-bold text-blue-400">General Knowledge</span>
+                    <p class="text-xs text-slate-400 mt-1">Multiple Choice (A, B, C, D)</p>
+                </div>
+                <div class="bg-slate-900/70 p-4 rounded-xl border border-slate-700/60">
+                    <span class="text-xs text-slate-500 font-semibold uppercase tracking-wider block mb-1">PART 2 (Q11-15)</span>
+                    <span class="text-sm font-bold text-amber-400">HTML & Java</span>
+                    <p class="text-xs text-slate-400 mt-1">Identification (Text Input)</p>
+                </div>
+                <div class="bg-slate-900/70 p-4 rounded-xl border border-slate-700/60">
+                    <span class="text-xs text-slate-500 font-semibold uppercase tracking-wider block mb-1">TIMER RULE</span>
+                    <span class="text-sm font-bold text-emerald-400">30 Seconds / Item</span>
+                    <p class="text-xs text-slate-400 mt-1">Auto-advances when time expires</p>
+                </div>
+            </div>
+
+            <button id="start-btn" class="w-full sm:w-auto px-10 py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-lg shadow-blue-600/30 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] text-lg cursor-pointer">
+                🚀 Start Quiz
+            </button>
+        </div>
+
+        <!-- 2. QUIZ QUESTION SCREEN -->
+        <div id="quiz-card" class="hidden bg-slate-800/90 backdrop-blur-md rounded-2xl border border-slate-700 p-6 sm:p-8 shadow-2xl fade-in">
+            <!-- Header Status Bar -->
+            <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
+                <div>
+                    <span id="question-category" class="inline-block px-3 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-semibold rounded-full mb-1">
+                        General Knowledge
+                    </span>
+                    <h3 id="question-tracker" class="text-sm font-medium text-slate-400">Question 1 of 15</h3>
+                </div>
+
+                <!-- Timer Display -->
+                <div class="flex items-center space-x-2 bg-slate-900 px-4 py-2 rounded-xl border border-slate-700">
+                    <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span id="timer-text" class="font-mono text-xl font-bold text-amber-400">30s</span>
+                </div>
+            </div>
+
+            <!-- Countdown Progress Bar -->
+            <div class="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden mb-6">
+                <div id="timer-bar" class="bg-emerald-500 h-full w-full timer-progress"></div>
+            </div>
+
+            <!-- Question Text -->
+            <h2 id="question-text" class="text-xl sm:text-2xl font-bold text-white mb-6 leading-snug">
+                Question prompt text...
+            </h2>
+
+            <!-- SECTION A: Multiple Choice Container (Q1-10) -->
+            <div id="mc-container" class="space-y-3 mb-8">
+                <!-- Dynamically populated options -->
+            </div>
+
+            <!-- SECTION B: Identification Input Container (Q11-15) -->
+            <div id="identification-container" class="hidden mb-8">
+                <label for="id-input" class="block text-sm font-medium text-slate-300 mb-2">
+                    Type your answer:
+                </label>
+                <input type="text" id="id-input" placeholder="Enter keyword or answer..." 
+                       class="w-full bg-slate-900 border border-slate-700 text-white px-4 py-3.5 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 text-base sm:text-lg tracking-wide transition-all"
+                       autocomplete="off">
+                <p class="text-xs text-slate-500 mt-2">💡 Evaluation is case-insensitive. Extra spaces are trimmed automatically.</p>
+            </div>
+
+            <!-- Validation Alert Message Box -->
+            <div id="alert-box" class="hidden mb-4 p-3 rounded-lg bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs sm:text-sm flex items-center justify-between">
+                <span>⚠️ Please select an answer or enter a value before submitting!</span>
+                <button id="close-alert" class="text-rose-300 font-bold ml-2">✕</button>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex justify-between items-center pt-4 border-t border-slate-700/60">
+                <span class="text-xs text-slate-500">Submit answer or wait for timer</span>
+                <button id="next-btn" class="px-7 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl shadow-lg shadow-blue-600/20 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex items-center space-x-2 cursor-pointer">
+                    <span>Submit Answer</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- 3. RESULTS & ANSWER REVIEW SCREEN -->
+        <div id="result-card" class="hidden space-y-6 fade-in">
+            <!-- Score Overview Card -->
+            <div class="bg-slate-800/90 backdrop-blur-md rounded-2xl border border-slate-700 p-8 shadow-2xl text-center">
+                <div id="feedback-badge" class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-extrabold border-4">
+                    <!-- Dynamic Emoji/Border -->
+                </div>
+                <h2 id="feedback-title" class="text-2xl sm:text-3xl font-extrabold text-white mb-1">Quiz Finished!</h2>
+                <p id="feedback-subtitle" class="text-slate-400 mb-6 text-sm">Here is a detailed summary of your score.</p>
+
+                <!-- Score Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-xl mx-auto mb-8">
+                    <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700">
+                        <span class="text-xs text-slate-400 block mb-1">Total Score</span>
+                        <span id="score-text" class="text-2xl font-black text-blue-400">0 / 15</span>
+                    </div>
+                    <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700">
+                        <span class="text-xs text-slate-400 block mb-1">Percentage</span>
+                        <span id="percentage-text" class="text-2xl font-black text-emerald-400">0%</span>
+                    </div>
+                    <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700">
+                        <span class="text-xs text-slate-400 block mb-1">Correct Answers</span>
+                        <span id="correct-count" class="text-2xl font-black text-emerald-400">0</span>
+                    </div>
+                    <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700">
+                        <span class="text-xs text-slate-400 block mb-1">Incorrect / Timeout</span>
+                        <span id="incorrect-count" class="text-2xl font-black text-rose-400">0</span>
+                    </div>
+                </div>
+
+                <button id="restart-btn" class="px-8 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] inline-flex items-center space-x-2 cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    <span>Restart Quiz</span>
+                </button>
+            </div>
+
+            <!-- Detailed Answer Review Section -->
+            <div class="bg-slate-800/90 backdrop-blur-md rounded-2xl border border-slate-700 p-6 sm:p-8 shadow-2xl">
+                <h3 class="text-xl font-bold text-white mb-6 flex items-center space-x-2">
+                    <span>📋 Question Review Key</span>
+                </h3>
+                <div id="review-container" class="space-y-4 max-h-96 overflow-y-auto pr-2">
+                    <!-- Dynamic review items generated via JS -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="max-w-3xl w-full mx-auto text-center py-4 text-xs text-slate-500">
+        Built for Visual Studio Code & Live Server • Web Tech & General Knowledge Module
+    </footer>
+
+    <!-- JavaScript Execution Engine -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // -------------------------------------------------------------
+            // QUIZ DATASET (10 General Knowledge MC + 5 HTML/Java Identification)
+            // -------------------------------------------------------------
+            const quizQuestions = [
+                // Q1 - Q10: General Knowledge (Multiple Choice)
+                {
+                    type: "mc",
+                    category: "General Knowledge",
+                    question: "1. What is the capital city of France?",
+                    options: ["A) Berlin", "B) Madrid", "C) Paris", "D) Rome"],
+                    correctIndex: 2,
+                    correctDisplay: "C) Paris"
+                },
+                {
+                    type: "mc",
+                    category: "General Knowledge",
+                    question: "2. Which planet in our solar system is known as the 'Red Planet'?",
+                    options: ["A) Venus", "B) Mars", "C) Jupiter", "D) Saturn"],
+                    correctIndex: 1,
+                    correctDisplay: "B) Mars"
+                },
+                {
+                    type: "mc",
+                    category: "General Knowledge",
+                    question: "3. Who is credited with inventing the light bulb for commercial use?",
+                    options: ["A) Nikola Tesla", "B) Thomas Edison", "C) Alexander Graham Bell", "D) Albert Einstein"],
+                    correctIndex: 1,
+                    correctDisplay: "B) Thomas Edison"
+                },
+                {
+                    type: "mc",
+                    category: "General Knowledge",
+                    question: "4. What is the largest ocean on Earth?",
+                    options: ["A) Atlantic Ocean", "B) Indian Ocean", "C) Arctic Ocean", "D) Pacific Ocean"],
+                    correctIndex: 3,
+                    correctDisplay: "D) Pacific Ocean"
+                },
+                {
+                    type: "mc",
+                    category: "General Knowledge",
+                    question: "5. What gas do plants absorb from the atmosphere during photosynthesis?",
+                    options: ["A) Oxygen", "B) Nitrogen", "C) Carbon Dioxide", "D) Hydrogen"],
+                    correctIndex: 2,
+                    correctDisplay: "C) Carbon Dioxide"
+                },
+                {
+                    type: "mc",
+                    category: "General Knowledge",
+                    question: "6. Which country is home to the Great Pyramid of Giza?",
+                    options: ["A) Egypt", "B) Greece", "C) Mexico", "D) Peru"],
+                    correctIndex: 0,
+                    correctDisplay: "A) Egypt"
+                },
+                {
+                    type: "mc",
+                    category: "General Knowledge",
+                    question: "7. What is the hardest naturally occurring substance on Earth?",
+                    options: ["A) Gold", "B) Iron", "C) Diamond", "D) Quartz"],
+                    correctIndex: 2,
+                    correctDisplay: "C) Diamond"
+                },
+                {
+                    type: "mc",
+                    category: "General Knowledge",
+                    question: "8. How many continents are there on Earth?",
+                    options: ["A) 5", "B) 6", "C) 7", "D) 8"],
+                    correctIndex: 2,
+                    correctDisplay: "C) 7"
+                },
+                {
+                    type: "mc",
+                    category: "General Knowledge",
+                    question: "9. What is the chemical symbol for Gold?",
+                    options: ["A) Ag", "B) Au", "C) Fe", "D) Go"],
+                    correctIndex: 1,
+                    correctDisplay: "B) Au"
+                },
+                {
+                    type: "mc",
+                    category: "General Knowledge",
+                    question: "10. What is the value of 12 squared (12 x 12)?",
+                    options: ["A) 124", "B) 144", "C) 164", "D) 132"],
+                    correctIndex: 1,
+                    correctDisplay: "B) 144"
+                },
+
+                // Q11 - Q15: HTML & Java Identification
+                {
+                    type: "id",
+                    category: "HTML & Java Concept",
+                    question: "11. [HTML] What is the HTML tag used to define a hyperlink?",
+                    acceptedAnswers: ["<a>", "a", "anchor"],
+                    correctDisplay: "<a>"
+                },
+                {
+                    type: "id",
+                    category: "HTML & Java Concept",
+                    question: "12. [HTML] Which tag is used to insert an image into an HTML web page?",
+                    acceptedAnswers: ["img", "image", "<img/>"],
+                    correctDisplay: "image"
+                },
+                {
+                    type: "id",
+                    category: "HTML & Java Concept",
+                    question: "13. [Java] What keyword in Java is used to define a method that belongs to the class rather than an instance?",
+                    acceptedAnswers: ["static"],
+                    correctDisplay: "static"
+                },
+                {
+                    type: "id",
+                    category: "HTML & Java Concept",
+                    question: "14. [Java] What built-in method call is used to print output to the console in Java?",
+                    acceptedAnswers: ["system.out.println", "system.out.print", "system.out.println()", "system.out.print()"],
+                    correctDisplay: "System.out.println()"
+                },
+                {
+                    type: "id",
+                    category: "HTML & Java Concept",
+                    question: "15. [HTML] What element tag is used to create a line break in HTML?",
+                    acceptedAnswers: ["br", "<br>", "<br/>"],
+                    correctDisplay: "br"
+                }
+            ];
+
+            // -------------------------------------------------------------
+            // STATE VARIABLES
+            // -------------------------------------------------------------
+            let currentIndex = 0;
+            let score = 0;
+            let userResponses = [];
+            let timerSeconds = 30;
+            let timerInterval = null;
+
+            // DOM Element References
+            const startBtn = document.getElementById("start-btn");
+            const nextBtn = document.getElementById("next-btn");
+            const restartBtn = document.getElementById("restart-btn");
+            const alertBox = document.getElementById("alert-box");
+            const closeAlertBtn = document.getElementById("close-alert");
+
+            // Event Listeners
+            if (startBtn) startBtn.addEventListener("click", startQuiz);
+            if (nextBtn) nextBtn.addEventListener("click", function() { submitAnswer(false); });
+            if (restartBtn) restartBtn.addEventListener("click", startQuiz);
+            if (closeAlertBtn) closeAlertBtn.addEventListener("click", hideAlert);
+
+            // -------------------------------------------------------------
+            // FUNCTIONS
+            // -------------------------------------------------------------
+
+            function hideAlert() {
+                alertBox.classList.add("hidden");
+            }
+
+            function showAlert() {
+                alertBox.classList.remove("hidden");
+            }
+
+            function startQuiz() {
+                hideAlert();
+                currentIndex = 0;
+                score = 0;
+                userResponses = [];
+
+                // Screen Toggle
+                document.getElementById("start-card").classList.add("hidden");
+                document.getElementById("result-card").classList.add("hidden");
+                document.getElementById("quiz-card").classList.remove("hidden");
+
+                // Header Badge
+                const statusDot = document.getElementById("status-dot");
+                statusDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
+                document.getElementById("status-text").innerText = "Quiz Live";
+
+                renderQuestion();
+            }
+
+            function renderQuestion() {
+                hideAlert();
+                clearInterval(timerInterval);
+
+                const q = quizQuestions[currentIndex];
+
+                document.getElementById("question-category").innerText = q.category;
+                document.getElementById("question-tracker").innerText = `Question ${currentIndex + 1} of ${quizQuestions.length}`;
+                document.getElementById("question-text").innerText = q.question;
+
+                const mcContainer = document.getElementById("mc-container");
+                const idContainer = document.getElementById("identification-container");
+
+                if (q.type === "mc") {
+                    mcContainer.classList.remove("hidden");
+                    idContainer.classList.add("hidden");
+                    mcContainer.innerHTML = "";
+
+                    q.options.forEach((optText, index) => {
+                        mcContainer.innerHTML += `
+                            <label class="flex items-center space-x-3 bg-slate-900/60 hover:bg-slate-700/50 p-4 rounded-xl border border-slate-700/60 cursor-pointer transition-colors duration-150">
+                                <input type="radio" name="mc-option" value="${index}" class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-slate-600 bg-slate-800">
+                                <span class="text-slate-200 font-medium text-base sm:text-lg">${optText}</span>
+                            </label>
+                        `;
+                    });
+                } else if (q.type === "id") {
+                    mcContainer.classList.add("hidden");
+                    idContainer.classList.remove("hidden");
+                    const inputField = document.getElementById("id-input");
+                    inputField.value = "";
+                    setTimeout(() => inputField.focus(), 50);
+                }
+
+                startTimer();
+            }
+
+            function startTimer() {
+                timerSeconds = 30;
+                updateTimerDisplay();
+
+                timerInterval = setInterval(() => {
+                    timerSeconds--;
+                    updateTimerDisplay();
+
+                    if (timerSeconds <= 0) {
+                        clearInterval(timerInterval);
+                        submitAnswer(true); // Auto-submit on time expiry
+                    }
+                }, 1000);
+            }
+
+            function updateTimerDisplay() {
+                const timerText = document.getElementById("timer-text");
+                const timerBar = document.getElementById("timer-bar");
+
+                timerText.innerText = `${timerSeconds}s`;
+                const percentage = (timerSeconds / 30) * 100;
+                timerBar.style.width = `${percentage}%`;
+
+                if (timerSeconds > 15) {
+                    timerBar.className = "bg-emerald-500 h-full timer-progress";
+                    timerText.className = "font-mono text-xl font-bold text-emerald-400";
+                } else if (timerSeconds > 7) {
+                    timerBar.className = "bg-amber-500 h-full timer-progress";
+                    timerText.className = "font-mono text-xl font-bold text-amber-400";
+                } else {
+                    timerBar.className = "bg-rose-500 h-full timer-progress";
+                    timerText.className = "font-mono text-xl font-bold text-rose-400 animate-pulse";
+                }
+            }
+
+            function submitAnswer(isTimeout) {
+                hideAlert();
+
+                const q = quizQuestions[currentIndex];
+                let userGivenAnswer = "";
+                let isCorrect = false;
+
+                if (isTimeout) {
+                    userGivenAnswer = "[Time Expired]";
+                    isCorrect = false;
+                } else if (q.type === "mc") {
+                    const selected = document.querySelector('input[name="mc-option"]:checked');
+                    if (!selected) {
+                        showAlert();
+                        return;
+                    }
+                    const selectedVal = parseInt(selected.value);
+                    userGivenAnswer = q.options[selectedVal];
+                    isCorrect = (selectedVal === q.correctIndex);
+                } else if (q.type === "id") {
+                    const inputVal = document.getElementById("id-input").value.trim();
+                    if (!inputVal) {
+                        showAlert();
+                        return;
+                    }
+                    userGivenAnswer = inputVal;
+                    const cleanInput = inputVal.toLowerCase();
+                    isCorrect = q.acceptedAnswers.some(ans => ans.toLowerCase() === cleanInput);
+                }
+
+                clearInterval(timerInterval);
+
+                if (isCorrect) {
+                    score++;
+                }
+
+                userResponses.push({
+                    questionNum: currentIndex + 1,
+                    questionText: q.question,
+                    userAnswer: userGivenAnswer,
+                    correctAnswer: q.correctDisplay,
+                    isCorrect: isCorrect
+                });
+
+                currentIndex++;
+                if (currentIndex < quizQuestions.length) {
+                    renderQuestion();
+                } else {
+                    showResults();
+                }
+            }
+
+            function showResults() {
+                const statusDot = document.getElementById("status-dot");
+                statusDot.className = "w-2.5 h-2.5 rounded-full bg-slate-500";
+                document.getElementById("status-text").innerText = "Completed";
+
+                document.getElementById("quiz-card").classList.add("hidden");
+                document.getElementById("result-card").classList.remove("hidden");
+
+                const total = quizQuestions.length;
+                const percentage = Math.round((score / total) * 100);
+
+                document.getElementById("score-text").innerText = `${score} / ${total}`;
+                document.getElementById("percentage-text").innerText = `${percentage}%`;
+                document.getElementById("correct-count").innerText = score;
+                document.getElementById("incorrect-count").innerText = total - score;
+
+                const badge = document.getElementById("feedback-badge");
+                const title = document.getElementById("feedback-title");
+                const subtitle = document.getElementById("feedback-subtitle");
+
+                if (percentage >= 90) {
+                    badge.innerText = "🌟";
+                    badge.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-extrabold border-4 border-emerald-500 bg-emerald-500/10";
+                    title.innerText = "Outstanding Performance!";
+                    subtitle.innerText = "Mastery demonstrated across General Knowledge and Code syntax!";
+                } else if (percentage >= 70) {
+                    badge.innerText = "🎉";
+                    badge.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-extrabold border-4 border-blue-500 bg-blue-500/10";
+                    title.innerText = "Great Job!";
+                    subtitle.innerText = "Solid understanding! Just a few items to review.";
+                } else if (percentage >= 50) {
+                    badge.innerText = "👍";
+                    badge.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-extrabold border-4 border-amber-500 bg-amber-500/10";
+                    title.innerText = "Good Attempt!";
+                    subtitle.innerText = "You passed, but review the key below to sharpen your knowledge.";
+                } else {
+                    badge.innerText = "📚";
+                    badge.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-extrabold border-4 border-rose-500 bg-rose-500/10";
+                    title.innerText = "Keep Practicing!";
+                    subtitle.innerText = "Don't give up! Study the missed topics and try again.";
+                }
+
+                const reviewContainer = document.getElementById("review-container");
+                reviewContainer.innerHTML = "";
+
+                userResponses.forEach(res => {
+                    const isPass = res.isCorrect;
+                    reviewContainer.innerHTML += `
+                        <div class="p-4 rounded-xl border ${isPass ? 'bg-emerald-950/20 border-emerald-800/40' : 'bg-rose-950/20 border-rose-800/40'}">
+                            <div class="flex items-start justify-between gap-2 mb-2">
+                                <span class="font-bold text-sm text-slate-200">${res.questionText}</span>
+                                <span class="px-2 py-0.5 text-xs font-bold rounded ${isPass ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'}">
+                                    ${isPass ? 'Correct' : 'Incorrect'}
+                                </span>
+                            </div>
+                            <div class="text-xs space-y-1">
+                                <p class="text-slate-400">Your Answer: <span class="${isPass ? 'text-emerald-300' : 'text-rose-300'} font-semibold">${res.userAnswer}</span></p>
+                                ${!isPass ? `<p class="text-slate-400">Correct Answer: <span class="text-emerald-400 font-semibold">${res.correctAnswer}</span></p>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        });
+    </script>
+</body>
+</html>
